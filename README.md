@@ -1,2 +1,4 @@
-# takeblock
-this project it to get the pchain blocks and store them in local database 
+# blockstore 
+# stores pchain blocks,transactions, nodes, minders and other important information on a local database 
+
+
