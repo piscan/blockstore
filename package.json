@@ -1,0 +1,16 @@
+{
+  "name": "blockstore",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "John Savadkuhi",
+  "license": "GPL.v3",
+  "dependencies": {
+    "mongodb": "^3.2.7",
+    "pweb3": "^1.0.0-beta.62"
+  }
+}
