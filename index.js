@@ -1,7 +1,7 @@
 const Web3 = require("pweb3");
 const MongoClient = require('mongodb').MongoClient;
 
-class PiScan {
+export class BlockStore {
 
     constructor() {
 
@@ -292,11 +292,12 @@ class PiScan {
 
 }
 
+// this is a way to use BlockStore Class
 async function run() {
 
-    let piScan = new PiScan();
-    await piScan.initDb();
-    await piScan.initIndex();
+    const blockStore = new BlockStore();
+    await blockStore.initDb();
+    await blockStore.initIndex();
 
 
     setInterval(async () => {

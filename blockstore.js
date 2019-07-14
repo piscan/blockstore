@@ -5,7 +5,7 @@
 const Web3 = require("pweb3");
 const MongoClient = require('mongodb').MongoClient;
 
-class PiScan {
+class BlockStore {
 
     constructor() {
 
