@@ -1,16 +1,24 @@
 {
-  "name": "blockstore",
+  "name": "@piscan/blockstore",
   "version": "1.0.0",
-  "description": "",
+  "description": "stores Pchain blocks,transactions, nodes, miners and other important information on a local database",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "John Savadkuhi",
-  "license": "GPL.v3",
+  "license": "ISC",
   "dependencies": {
     "mongodb": "^3.2.7",
     "pweb3": "^1.0.0-beta.62"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/piscan/blockstore.git"
+  },
+  "bugs": {
+    "url": "https://github.com/piscan/blockstore/issues"
+  },
+  "homepage": "https://github.com/piscan/blockstore#readme"
 }
