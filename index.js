@@ -1,17 +1,17 @@
 const Web3 = require("pweb3");
 const MongoClient = require('mongodb').MongoClient;
 
- class BlockStore {
+class BlockStore {
 
-    constructor() {
+    constructor(dbName = 'piscan', blockToRead = 1000, blockColl = 'blocks', transactionColl = 'transactions', blockIncludesTransactions = 'blocksWithTransactions') {
 
         this.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:6969/pchain"));
         this.url = "mongodb://localhost:27017";
-        this.dbName = 'piscan';
-        this.blockCollection = 'blocks1';
-        this.transactionsCollection = 'transactions';
-        this.blockWithTransactions = 'blocksWithTransactions';
-        this.theNumberOfBlockToRead = 1000;
+        this.dbName = dbName;
+        this.blockCollection = blockColl;
+        this.transactionsCollection = transactionColl;
+        this.blockWithTransactions = blockIncludesTransactions;
+        this.theNumberOfBlockToRead = blockToRead;
 
     }
 
@@ -53,9 +53,9 @@ const MongoClient = require('mongodb').MongoClient;
         try {
 
 
-            let collection = await this.db.collection(coll);
+            const collection = await this.db.collection(coll);
 
-            let res = await collection.find().limit(1).sort({$natural: -1}).toArray();
+            const res = await collection.find().limit(1).sort({$natural: -1}).toArray();
 
 
             if (res.length === 0) {
@@ -81,21 +81,14 @@ const MongoClient = require('mongodb').MongoClient;
 
 
         if (data.length !== 0) {
-
             const collection = await this.db.collection(coll);
 
             const inserted = await collection.insertMany(data);
 
-            if (inserted.insertedCount < 1000) {
-                console.log("breaking !!!!!!!!!")
-                return;
-            }
             console.log(`inserted in ${coll} : ${inserted.insertedCount}`);
 
-            //  return inserted.insertedCount ;
-
-
         }
+
     }
 
     async getBlockInfo() {
@@ -141,8 +134,8 @@ const MongoClient = require('mongodb').MongoClient;
             }
 
 
-            await this.saveInDatabase(sortedData, this.blockCollection);
-            await this.saveInDatabase(includeTransactionsBlock, this.blockWithTransactions);
+            await this.saveInDatabase(sortedData, this.blockCollection).catch(e => console.log(e));
+            await this.saveInDatabase(includeTransactionsBlock, this.blockWithTransactions).catch(e => console.log(e));
 
 
         }, 500)
@@ -150,107 +143,6 @@ const MongoClient = require('mongodb').MongoClient;
     }
 
     //endregion
-
-
-    //region  transactions
-
-    async getTransactions() {
-
-        const collection = await this.db.collection(this.blockWithTransactions);
-
-        const index = await this.getIndex();
-
-        for (let i = index; i < index + 2; i++) {
-
-
-            if (index === "undefined ") {
-                console.log("transactions synced ");
-                return;
-            }
-
-            const data = await collection.find({}, {projection: {number: 1, _id: 0}}).skip(i).limit(1).toArray();
-
-            if (data.length === 0) {
-                console.log("data is null ");
-                return;
-            }
-            const count = await this.web3.pi.getBlockTransactionCount(data[0].number);
-
-
-            for (let i = 0; i < count; i++) {
-
-                const x = await this.web3.pi.getTransactionFromBlock(data[0].number, i);
-
-
-                await this.saveInDatabase([x], this.transactionsCollection);
-
-            }
-
-            await this.setIndex(index, i);
-
-        }
-
-    }
-
-    async initIndex() {
-
-        const collection = await this.db.collection("forIndex");
-
-        await collection.insertOne({index: 0});
-
-    }
-
-    async setIndex(oldvalue, newvalue) {
-
-        const collection = await this.db.collection("forIndex");
-
-        const query = {index: oldvalue};
-        const newQuery = {$set: {index: newvalue}};
-
-
-        try {
-
-            await collection.updateOne(query, newQuery);
-
-        } catch (e) {
-
-            console.log("error ", e);
-
-        }
-
-
-    }
-
-    async getIndex() {
-
-        try {
-
-            const collection = await this.db.collection("forIndex");
-
-            const index = await collection.findOne();
-
-
-            console.log("idnex :  ", index.index);
-
-            if (index.index === 0) {
-                return 0;
-            } else {
-                return index.index + 1;
-
-            }
-
-
-        } catch (e) {
-
-            throw  new Error(e);
-
-
-        }
-
-    }
-
-    //endregion
-
 
     async isOkData() {
 
@@ -293,7 +185,7 @@ const MongoClient = require('mongodb').MongoClient;
 }
 
 
-
+module.exports = {BlockStore};
 
 
 
